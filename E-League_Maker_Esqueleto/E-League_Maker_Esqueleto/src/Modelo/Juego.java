@@ -1,6 +1,7 @@
 package Modelo;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Juego {
@@ -8,11 +9,13 @@ public class Juego {
     private String nombre;
     private String desarrolladora;
     private LocalDate fechaLanzamiento;
+
     private List<Competicion> listaCompeticiones;
 
 
+
     // Constructores
-    public Juego(int cod, String nombre, String desarrolladora, LocalDate fechaLanzamiento, List<Competicion> listaCompeticiones) {
+    public Juego(int cod, String nombre, String desarrolladora, LocalDate fechaLanzamiento,List<Competicion> listaCompeticiones) {
         this.cod = cod;
         this.nombre = nombre;
         this.desarrolladora = desarrolladora;
@@ -54,20 +57,5 @@ public class Juego {
         this.fechaLanzamiento = fechaLanzamiento;
     }
 
-    public List<Competicion> getListaCompeticiones() {
-        return listaCompeticiones;
-    }
 
-    public void setListaCompeticiones(List<Competicion> listaCompeticiones) {
-        this.listaCompeticiones = listaCompeticiones;
-    }
-
-    // To String
-    @Override
-    public String toString() {
-        return "JUEGO:" +
-                "Nombre:'" + nombre + '\'' +
-                ", Desarrolladora:'" + desarrolladora + '\'' +
-                ", Fecha de Lanzamiento:" + fechaLanzamiento;
-    }
 }

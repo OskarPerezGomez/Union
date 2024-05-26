@@ -5,8 +5,6 @@
  */
 package Controlador.ControladoresVista;
 
-import Vista.VentanaInscripcion;
-import Vista.VentanaLogin;
 import Vista.VentanaSeleccionAdmin;
 
 import java.awt.event.ActionEvent;
@@ -17,7 +15,6 @@ public class ControladorVentanaSeleccion {
     private ControladorVista cv;
 
     private VentanaSeleccionAdmin vSeleccionAdmin;
-    private VentanaInscripcion vInscripcion;
 
     public ControladorVentanaSeleccion(ControladorVista cv)
     {
@@ -30,7 +27,6 @@ public class ControladorVentanaSeleccion {
         vSeleccionAdmin = new VentanaSeleccionAdmin();
 
         vSeleccionAdmin.addBCompetiAL(new BModoCompeti());
-        vSeleccionAdmin.addBInscripcionAL(new BModoInscripcion());
         vSeleccionAdmin.setVisible(true);
     }
 
@@ -57,7 +53,7 @@ public class ControladorVentanaSeleccion {
         public void actionPerformed(ActionEvent e)
         {
             vSeleccionAdmin.dispose();
-            cv.mostrarVentanaInscripcion();
+            //PONER VENTANA INSCRIPON
 
         }
     }

@@ -93,14 +93,4 @@ public class Competicion {
     public void setListaJornada(List<Jornada> listaJornada) {
         this.listaJornada = listaJornada;
     }
-
-    // To String
-    @Override
-    public String toString() {
-        return "COMPETICIÓN:" +
-                "Nombre:'" + nombre + '\'' +
-                ", Fecha de Incio:" + fechaInicio +
-                ", Fecha de Fin:" + fechaFin +
-                ", Juego:" + juego;
-    }
 }

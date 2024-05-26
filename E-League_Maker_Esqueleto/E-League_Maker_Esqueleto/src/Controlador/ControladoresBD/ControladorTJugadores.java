@@ -10,8 +10,6 @@ import Modelo.Jugador;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ControladorTJugadores {
     /**
@@ -28,11 +26,10 @@ public class ControladorTJugadores {
      * @param jugador
      */
     private Jugador jugador;
-    private List<Jugador> listaJugadores;
+
     public ControladorTJugadores(ControladorBD cbd)
     {
         this.cbd = cbd;
-        listaJugadores = new ArrayList<>();
     }
 
 
@@ -149,7 +146,7 @@ public class ControladorTJugadores {
      * @return String
      * @throws Exception
      */
-    public void borrarJugador(int cod) throws Exception {
+    public String borrarJugador() throws Exception {
         con = cbd.abrirConexion();
         System.out.println("\nBorrando Jugador con nombre "+jugador.getNickname());
         try {
@@ -157,7 +154,7 @@ public class ControladorTJugadores {
             CallableStatement cs = con.prepareCall(llamada);
 
 
-            cs.setInt(1, cod);
+            cs.setInt(1, jugador.getCod());
 
             cs.execute();
             cs.close();
@@ -174,7 +171,7 @@ public class ControladorTJugadores {
                 }
             }
         }
-        System.out.println("Jugador borrado");
+        return "jugador borrado";
     }
 
     /**
@@ -189,12 +186,12 @@ public class ControladorTJugadores {
      * @throws Exception
      */
 
-    public void modificarJugador(Jugador jugador) throws Exception
+    public String modificarJugador(Jugador jugador) throws Exception
     {
         con = cbd.abrirConexion();
         System.out.println("\nModificando Jugador con nombre " + jugador.getNickname());
         try {
-            String llamada = "{ call crud_Jugadores.modificar_Jugadores(?,?,?,?,?,?,?,?,?) }";
+            String llamada = "{ call crud_Jugadores.modificar_Jugadores(?,?,?,?,?,?,?,?) }";
             CallableStatement cs = con.prepareCall(llamada);
 
             this.jugador = jugador;
@@ -204,9 +201,11 @@ public class ControladorTJugadores {
             cs.setString(4,jugador.getRol());
             cs.setInt(5,jugador.getSalario());
             cs.setString(6,jugador.getNacionalidad());
-            cs.setDate(7,Date.valueOf(jugador.getFechaNacimiento()));
+            if(jugador.getFechaNacimiento() == null)
+                cs.setDate(7,Date.valueOf(LocalDate.now()));
+            if(jugador.getFechaNacimiento() != null)
+                cs.setDate(7,Date.valueOf(jugador.getFechaNacimiento()));
             cs.setString(8,jugador.getNickname());
-            cs.setInt(9,jugador.getEquipo().getCod());
 
 
 
@@ -216,7 +215,7 @@ public class ControladorTJugadores {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new Exception("Error al modificar el jugador", e);
+            throw new Exception("Error al modificar jugador", e);
         } finally {
             if (con != null) {
                 try {
@@ -226,7 +225,7 @@ public class ControladorTJugadores {
                 }
             }
         }
-        System.out.println("Jugador modificado!");
+        return "Jugador modificado!";
     }
 
     /**
@@ -237,7 +236,7 @@ public class ControladorTJugadores {
      * @return
      * @throws Exception
      */
-    public void insertarJugador(Jugador jugador) throws Exception {
+    public String insertarJugador(Jugador jugador) throws Exception {
         con = cbd.abrirConexion();
         System.out.println("\nInsertando jugador con nickname" + jugador.getNickname());
         try {
@@ -250,7 +249,10 @@ public class ControladorTJugadores {
             cs.setString(3,jugador.getRol());
             cs.setInt(4,jugador.getSalario());
             cs.setString(5,jugador.getNacionalidad());
-            cs.setDate(6,Date.valueOf(jugador.getFechaNacimiento()));
+            if(jugador.getFechaNacimiento() == null)
+                cs.setDate(6,Date.valueOf(LocalDate.now()));
+            if(jugador.getFechaNacimiento() != null)
+                cs.setDate(6,Date.valueOf(jugador.getFechaNacimiento()));
             cs.setString(7,jugador.getNickname());
             cs.setInt(8,jugador.getEquipo().getCod());
 
@@ -259,7 +261,7 @@ public class ControladorTJugadores {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new Exception("Error al insertar el jugador", e);
+            throw new Exception("Error al inserta jugador", e);
         } finally {
             if (con != null) {
                 try {
@@ -269,54 +271,10 @@ public class ControladorTJugadores {
                 }
             }
         }
-        System.out.println("Jugador insertado");
+        return "Jugador insertado";
     }
 
-    public List buscarJugadores() throws Exception {
-        con = cbd.abrirConexion();
-        System.out.println("\nBuscando todos los jugadores");
-        try {
-            listaJugadores.clear();
-            String llamada = "{ ? = call crud_Jugadores.consultar_todos_jugadores() }";
-            CallableStatement cs = con.prepareCall(llamada);
 
-            cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
-
-            cs.execute();
-
-            ResultSet rs = (ResultSet) cs.getObject(1);
-
-            while (rs.next()) {
-                jugador = new Jugador();
-                jugador.setCod(rs.getInt("cod"));
-                jugador.setNombre(rs.getString("nombre"));
-                jugador.setApellido((rs.getString("apellido")));
-                jugador.setRol(rs.getString("rol"));
-                jugador.setSalario(rs.getInt("salario"));
-                jugador.setNacionalidad(rs.getString("nacionalidad"));
-                jugador.setFechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate());
-                jugador.setNickname(rs.getString("nickname"));
-                jugador.setEquipo(cbd.buscarEquipo(rs.getInt("cod_equipo")));
-                listaJugadores.add(jugador);
-            }
-
-            rs.close();
-            cs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new Exception("Error al consultar el jugador", e);
-        } finally {
-            if (con != null) {
-                try {
-                    cbd.cerrarConexion(con);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return listaJugadores;
-    }
 
 
 

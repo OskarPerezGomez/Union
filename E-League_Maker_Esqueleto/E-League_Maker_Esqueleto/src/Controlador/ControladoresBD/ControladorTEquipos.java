@@ -9,8 +9,6 @@ import Modelo.Equipo;
 
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ControladorTEquipos {
 
@@ -27,13 +25,8 @@ public class ControladorTEquipos {
      * @param equipo
      */
     private Equipo equipo;
-    private List<Equipo> listaEquipos;
 
-    public ControladorTEquipos(ControladorBD cbd)
-    {
-        this.cbd = cbd;
-        listaEquipos = new ArrayList<>();
-    }
+    public ControladorTEquipos(ControladorBD cbd) {this.cbd = cbd;}
 
     /**
      * Este metodo busca el objeto y lo instancia en la clase
@@ -134,7 +127,7 @@ public class ControladorTEquipos {
      * @return String
      * @throws Exception
      */
-    public void borrarEquipo(int cod) throws Exception {
+    public String borrarEquipo() throws Exception {
         con = cbd.abrirConexion();
         System.out.println("\nBorrando Equipo con nombre "+equipo.getNombre());
         try {
@@ -142,7 +135,7 @@ public class ControladorTEquipos {
             CallableStatement cs = con.prepareCall(llamada);
 
 
-            cs.setInt(1, cod);
+            cs.setInt(1, equipo.getCod());
 
             cs.execute();
             cs.close();
@@ -159,7 +152,7 @@ public class ControladorTEquipos {
                 }
             }
         }
-        System.out.println("equipo borrado");
+        return "equipo borrado";
     }
 
     /**
@@ -174,7 +167,7 @@ public class ControladorTEquipos {
      * @throws Exception
      */
 
-    public void modificarEquipo(Equipo equipo) throws Exception
+    public String modificarEquipo(Equipo equipo) throws Exception
     {
         con = cbd.abrirConexion();
         System.out.println("\nModificando equipo con nombre " + equipo.getNombre());
@@ -192,7 +185,7 @@ public class ControladorTEquipos {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new Exception("Error al modificar el equipo", e);
+            throw new Exception("Error al modificar equipo", e);
         } finally {
             if (con != null) {
                 try {
@@ -202,7 +195,7 @@ public class ControladorTEquipos {
                 }
             }
         }
-        System.out.println("Equipo modificado!");
+        return "Equipo modificado!";
     }
 
     /**
@@ -213,7 +206,7 @@ public class ControladorTEquipos {
      * @return
      * @throws Exception
      */
-    public void insertarEquipo(Equipo equipo) throws Exception {
+    public String insertarEquipo(Equipo equipo) throws Exception {
         con = cbd.abrirConexion();
         System.out.println("\nInsertando equipo con nombre" + equipo.getNombre());
         try {
@@ -229,7 +222,7 @@ public class ControladorTEquipos {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new Exception("Error al insertar el equipo", e);
+            throw new Exception("Error al inserta equipo", e);
         } finally {
             if (con != null) {
                 try {
@@ -239,128 +232,7 @@ public class ControladorTEquipos {
                 }
             }
         }
-        System.out.println("Equipo insertado");
-    }
-
-    public List buscarEquipos() throws Exception {
-        con = cbd.abrirConexion();
-        try {
-            listaEquipos.clear();
-            String llamada = "{ ? = call crud_Equipos.consultar_todos_equipos() }";
-            CallableStatement cs = con.prepareCall(llamada);
-
-            cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
-
-            cs.execute();
-
-            ResultSet rs = (ResultSet) cs.getObject(1);
-
-            while (rs.next()) {
-                equipo = new Equipo();
-                equipo.setCod(rs.getInt("cod"));
-                equipo.setNombre(rs.getString("nombre"));
-                equipo.setFechaFundacion(rs.getDate("fecha_fundacion").toLocalDate());
-                listaEquipos.add(equipo);
-            }
-
-            rs.close();
-            cs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new Exception("Error al consultar el equipo", e);
-        } finally {
-            if (con != null) {
-                try {
-                    cbd.cerrarConexion(con);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return listaEquipos;
-    }
-
-    public List buscarEquiposInscribir(int cod) throws Exception {
-        con = cbd.abrirConexion();
-        System.out.println("\nBuscando equipos que no esten en la competición "+cod);
-        try {
-            listaEquipos.clear();
-            String llamada = "{ ? = call crud_Equipos.equipos_en_competicion(?) }";
-            CallableStatement cs = con.prepareCall(llamada);
-
-            cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
-            cs.setInt(2, cod);
-
-            cs.execute();
-
-            ResultSet rs = (ResultSet) cs.getObject(1);
-
-            while (rs.next()) {
-                equipo = new Equipo();
-                equipo.setCod(rs.getInt("cod"));
-                equipo.setNombre(rs.getString("nombre"));
-                equipo.setFechaFundacion(rs.getDate("fecha_fundacion").toLocalDate());
-                listaEquipos.add(equipo);
-            }
-
-            rs.close();
-            cs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new Exception("Error al consultar el equipo", e);
-        } finally {
-            if (con != null) {
-                try {
-                    cbd.cerrarConexion(con);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return listaEquipos;
-    }
-
-    public List buscarEquiposRescindir(int cod) throws Exception {
-        con = cbd.abrirConexion();
-        System.out.println("\nBuscando equipos que esten en la competición "+cod);
-        try {
-            listaEquipos.clear();
-            String llamada = "{ ? = call crud_Equipos.equipos_sin_competicion(?) }";
-            CallableStatement cs = con.prepareCall(llamada);
-
-            cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
-            cs.setInt(2, cod);
-
-            cs.execute();
-
-            ResultSet rs = (ResultSet) cs.getObject(1);
-
-            while (rs.next()) {
-                equipo = new Equipo();
-                equipo.setCod(rs.getInt("cod"));
-                equipo.setNombre(rs.getString("nombre"));
-                equipo.setFechaFundacion(rs.getDate("fecha_fundacion").toLocalDate());
-                listaEquipos.add(equipo);
-            }
-
-            rs.close();
-            cs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new Exception("Error al consultar el equipo", e);
-        } finally {
-            if (con != null) {
-                try {
-                    cbd.cerrarConexion(con);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return listaEquipos;
+        return "Equipo insertado";
     }
 
 

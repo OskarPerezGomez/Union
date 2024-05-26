@@ -40,12 +40,4 @@ public class Patrocinador {
     public void setEquipo(Equipo equipo) {
         this.equipo = equipo;
     }
-
-    // To String
-    @Override
-    public String toString() {
-        return "PATROCINADOR:" +
-                "Nombre:'" + nombre + '\'' +
-                ", Equipo:" + equipo;
-    }
 }
